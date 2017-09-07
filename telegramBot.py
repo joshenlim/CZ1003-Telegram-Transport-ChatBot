@@ -3,7 +3,9 @@ import time
 import telepot
 import datetime
 import requests
+import schedule
 
+from twitterAuth import twitter_pull
 from telepot.loop import MessageLoop
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
@@ -86,17 +88,19 @@ def on_callback_query(msg):
         #     await bot.answerCallbackQuery(query_id, text='No previous message to edit')
 
 bot = telepot.Bot('445426933:AAEFuo2S03hYfphhXWWCGNJemEkRZScF-Ho')
-answerer = telepot.helper.Answerer(bot)
 
-# MessageLoop(bot, handle).run_as_thread()
+print('Initializing Telegram Bot...')
 
+# Cron job to long poll twitter
+schedule.every(3).seconds.do(twitter_pull)
+
+# Listen to user actions on Telegram
 MessageLoop(bot, {
     'chat': on_chat_message,
     'callback_query': on_callback_query
 }).run_as_thread()
 
-print('Listening...')
-
 # Keep the program running
 while 1:
-    time.sleep(10)
+    schedule.run_pending()
+    time.sleep(1)

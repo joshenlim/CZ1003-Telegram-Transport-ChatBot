@@ -11,6 +11,7 @@ access_token_secret = cfg.twitter['tokenSecret']
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 
+# Compare timestamps to only sendMsg when there's a new tweet
 previous_timestamp = 0
 
 def twitter_pull():
@@ -27,13 +28,5 @@ def twitter_pull():
         print(latest_tweet.text)
         print(latest_tweet.created_at)
         previous_timestamp = latest_tweet_timestamp
-
-schedule.every(3).seconds.do(twitter_pull)
-
-while 1:
-    schedule.run_pending()
-    time.sleep(1)
-
-# for status in results:
-#     print(status.text)
-#     print(status.created_at)
+    else:
+        print("No updates")
