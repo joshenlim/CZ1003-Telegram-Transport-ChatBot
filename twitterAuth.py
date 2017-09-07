@@ -28,5 +28,6 @@ def twitter_pull():
         print(latest_tweet.text)
         print(latest_tweet.created_at)
         previous_timestamp = latest_tweet_timestamp
+
     else:
         print("No updates")
