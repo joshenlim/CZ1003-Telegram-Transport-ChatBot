@@ -6,27 +6,30 @@ import telepot
 import datetime
 import requests
 import oauth2
+import json
 
 from telepot.loop import MessageLoop
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 
-CONSUMER_KEY = 'CwQM1BnXlhRzEFjGZpEMZ03Tl'
-CONSUMER_SECRET = 'fTLNvcFQT7EkmO9zgugB2LeA3KSqbr6ZHS1WaDWc6lgdmgHKWv'
+# CONSUMER_KEY = 'CwQM1BnXlhRzEFjGZpEMZ03Tl'
+# CONSUMER_SECRET = 'fTLNvcFQT7EkmO9zgugB2LeA3KSqbr6ZHS1WaDWc6lgdmgHKWv'
+#
+# key = '905338848447627264-Hh5APJuT6MAo8uRu1tuljMB9keKzkPZ'
+# secret = 'xjmTuF3Ow2AahsZTdPOSeaeDhofrDwOz44pWfcE8BTLot'
 
-key = '905338848447627264-Hh5APJuT6MAo8uRu1tuljMB9keKzkPZ'
-secret = 'xjmTuF3Ow2AahsZTdPOSeaeDhofrDwOz44pWfcE8BTLot'
-
-def oauth_req(url, key, secret, http_method="GET", post_body="", http_headers=None):
-    consumer = oauth2.Consumer(key='CwQM1BnXlhRzEFjGZpEMZ03Tl', secret='fTLNvcFQT7EkmO9zgugB2LeA3KSqbr6ZHS1WaDWc6lgdmgHKWv')
-    token = oauth2.Token(key='905338848447627264-Hh5APJuT6MAo8uRu1tuljMB9keKzkPZ', secret='xjmTuF3Ow2AahsZTdPOSeaeDhofrDwOz44pWfcE8BTLot')
-    client = oauth2.Client(consumer, token)
-    resp, content = client.request( url, method=http_method, body=post_body, headers=http_headers )
-    return content
-
-home_timeline = oauth_req( 'https://api.twitter.com/1.1/statuses/user_timeline.json', 'TwitterDev', 'What' )
-
-print(home_timeline)
+# def oauth_req(url, key, secret, http_method="GET", post_body="", http_headers=None):
+#     consumer = oauth2.Consumer(key='CwQM1BnXlhRzEFjGZpEMZ03Tl', secret='fTLNvcFQT7EkmO9zgugB2LeA3KSqbr6ZHS1WaDWc6lgdmgHKWv')
+#     token = oauth2.Token(key='905338848447627264-Hh5APJuT6MAo8uRu1tuljMB9keKzkPZ', secret='xjmTuF3Ow2AahsZTdPOSeaeDhofrDwOz44pWfcE8BTLot')
+#     client = oauth2.Client(consumer, token)
+#     resp, content = client.request( url, method=http_method, body=post_body, headers=http_headers )
+#     return content
+#
+#
+#
+# home_timeline = oauth_req( 'https://api.twitter.com/1.1/statuses/user_timeline.json', 'TwitterDev', 'What' )
+#
+# print(home_timeline)
 
 
 # Sample API call to retrieve IP Address using requests lib
