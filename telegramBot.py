@@ -6,7 +6,7 @@ import requests
 import schedule
 
 import tweepy
-import twitterConfig as cfg
+import config as cfg
 
 from telepot.loop import MessageLoop
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
