@@ -7,6 +7,8 @@ import schedule
 import googlemaps
 import tweepy
 import uber
+import comfort
+import distance
 import config as cfg
 
 from telepot.loop import MessageLoop
@@ -31,9 +33,11 @@ chat_context = 'none'
 
 autocomplete_data = []
 pickup_location = ''
+pickup_placeid = ''
 pickup_lat = 0
 pickup_lng = 0
 dropoff_location = ''
+dropoff_placeid = ''
 dropoff_lat = 0
 dropoff_lng = 0
 
@@ -45,7 +49,7 @@ def twitter_pull():
 
     global previous_timestamp
     # user = "joshenlimek"
-    user = "smrt_singapore"
+    user = "joshenlimek"
     results = api.user_timeline(screen_name = user)
     latest_tweet = results[0]
     latest_tweet_timestamp = time.mktime(time.strptime(str(latest_tweet.created_at), '%Y-%m-%d %H:%M:%S'))
@@ -187,12 +191,11 @@ def on_callback_query(msg):
         global pickup_lat
         global pickup_lng
         global pickup_location
+        global pickup_placeid
         pickup_lat = place_result['result']['geometry']['location']['lat']
         pickup_lng = place_result['result']['geometry']['location']['lng']
         pickup_location = place_result['result']['name']
-
-        # print(pickup_lat)
-        # print(pickup_lng)
+        pickup_placeid = place_result['result']['place_id']
 
         notif_msg = 'Pick up location set at ' + place_result['result']['name']
         bot.answerCallbackQuery(query_id, text=notif_msg)
@@ -208,16 +211,22 @@ def on_callback_query(msg):
         global dropoff_lat
         global dropoff_lng
         global dropoff_location
+        global dropoff_placeid
         dropoff_lat = place_result['result']['geometry']['location']['lat']
         dropoff_lng = place_result['result']['geometry']['location']['lng']
         dropoff_location = place_result['result']['name']
-
-        # print(dropoff_lat)
-        # print(dropoff_lng)
+        dropoff_placeid = place_result['result']['place_id']
 
         notif_msg = 'Drop off location set at ' + place_result['result']['name']
         bot.answerCallbackQuery(query_id, text=notif_msg)
         bot.sendMessage(chat_assigned, 'Gotcha! Retrieving prices...')
+
+        distance_estimate = distance.estimate(pickup_placeid, dropoff_placeid)
+
+        # Calculate Grab Fare estimate
+        # Calculate CityCab Fare estimate
+
+        comfort_estimate = "Comfort: SGD " + comfort.estimate(distance_estimate)
 
         uber_estimate = "Uber: " + uber.get_price_estimate(
             start_lat=pickup_lat,
@@ -227,10 +236,11 @@ def on_callback_query(msg):
         )
 
         price_collation = InlineKeyboardMarkup(inline_keyboard=[
-            [dict(text=uber_estimate, url='http://www.google.com/')]
+            [dict(text=uber_estimate, url='http://www.google.com/')],
+            [dict(text=comfort_estimate, url='http://www.google.com/')]
         ])
 
-        price_estimate_msg = "Here are the prices to travel from " + pickup_location + " to " + dropoff_location + " from the various taxi companies!"
+        price_estimate_msg = "Here are the estimated prices to travel from " + pickup_location + " to " + dropoff_location + " from the various taxi companies!"
 
         bot.sendMessage(chat_assigned, price_estimate_msg, reply_markup=price_collation)
 

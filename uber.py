@@ -20,7 +20,7 @@ def get_price_estimate(start_lat, start_lng, end_lat, end_lng):
 
     for price in estimate:
         if price['localized_display_name'] == 'uberX':
-            print(price)
+            # print(price)
             low_estimate = int(price['low_estimate'])
             high_estimate = int(price['high_estimate'])
             return price['currency_code'] + ' ' + str(low_estimate) + ' - ' + str(high_estimate)
