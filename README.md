@@ -16,9 +16,9 @@ Dora is a one-stop bot to quickly retrieve taxi fare estimations and make compar
 
 ### Quick Start (Locally)
   1. Navigate into the directory via the terminal using <code>cd PATH/TO/FOLDER</code>
-  2. Create a <code>config.py</code> using <code>sampleconfig.py</code> as a template
+  2. Create a <code>config.py</code> using <code>sampleconfig.py</code> as a template. Be sure to have created your own bot via The Botfather and input your own bot API key.
   3. Run <code>python3 telegramBot.py</code> to initiate server
-  4. Note that the bot is <code>@dooorabot</code>, start conversing with the bot on Telegram
+  4. Start conversing with your own bot
 
 ## Example Input Flow
   * User: '/taxi'
