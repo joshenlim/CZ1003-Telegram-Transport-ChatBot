@@ -12,4 +12,10 @@ def estimate(origin, destination):
         destinations=destination_id,
         mode='driving'
     )
-    return distance_estimate['rows'][0]['elements'][0]['distance']['value']
+    
+    status = distance_estimate['rows'][0]['elements'][0]['status']
+
+    if status == 'ZERO_RESULTS':
+        return 0
+    else:
+        return distance_estimate['rows'][0]['elements'][0]['distance']['value']

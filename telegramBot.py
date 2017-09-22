@@ -3,10 +3,9 @@ import time
 import telepot
 import datetime
 import requests
-import schedule
 import googlemaps
-import tweepy
 import uber
+import grab
 import comfort
 import distance
 import config as cfg
@@ -15,20 +14,10 @@ from telepot.loop import MessageLoop
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 
-consumer_key = cfg.twitter['consumer']
-consumer_secret = cfg.twitter['consumerSecret']
-access_token = cfg.twitter['token']
-access_token_secret = cfg.twitter['tokenSecret']
-
 gmaps_key = cfg.google['places_key']
 gmaps = googlemaps.Client(key=gmaps_key)
 
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_token_secret)
-
-previous_timestamp = 0
 chat_assigned = 0
-train_lines = [ 'NSL', 'EWL', 'BPLRT', 'NSEWL', 'NSEWL', 'CCL', 'NEL', 'DTL' ]
 chat_context = 'none'
 
 autocomplete_data = []
@@ -43,33 +32,6 @@ dropoff_lng = 0
 
 bot = telepot.Bot(cfg.telegram['bot_id'])
 
-# This function runs indefinitely
-def twitter_pull():
-    api = tweepy.API(auth)
-
-    global previous_timestamp
-    # user = "joshenlimek"
-    user = "joshenlimek"
-    results = api.user_timeline(screen_name = user)
-    latest_tweet = results[0]
-    latest_tweet_timestamp = time.mktime(time.strptime(str(latest_tweet.created_at), '%Y-%m-%d %H:%M:%S'))
-    current_timestamp = time.time()
-
-    # Conditions for posting a message
-    is_tweet_relevant_to_train = any(train_line in latest_tweet.text for train_line in train_lines)
-    is_new_tweet = latest_tweet_timestamp > previous_timestamp
-    # Check for relevancy, if tweet within 5 minutes from current time, send message - is 5 minutes a good gauge?
-    # Add 8 hours because Twitter timezone is GMT-8
-    is_latest_tweet_old = current_timestamp < (5 * 60) + latest_tweet_timestamp + (8 * 60 * 60)
-
-    if is_new_tweet and is_tweet_relevant_to_train and is_latest_tweet_old:
-        message = latest_tweet.text
-        bot.sendMessage(chat_assigned, message)
-        previous_timestamp = latest_tweet_timestamp
-
-    else:
-        print("No updates")
-
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     global chat_assigned
@@ -77,20 +39,15 @@ def on_chat_message(msg):
     user_message = msg['text']
 
     if content_type == 'text':
-        # Start command required to retrieve chat_id of the current chat that bot is in
         if '/start' in user_message:
-            print("Initialize Twitter Pull Cron")
-            welcome_message = "Hey there! Phew, finally woken up. I'll be giving updates if any of the train services are down so stay tuned!"
-            bot.sendMessage(chat_assigned, welcome_message)
-            schedule.every(5).seconds.do(twitter_pull)
+            welcome_message = "Ola! Dora at your service! :) With me around you can easily compare prices across taxi companies - no more spending time opening all those applications before coming to a decision!"
+            help_message = 'Here\'s a list of my commands!\n/taxi - Compare prices across taxi companies by inputting your pick up and drop off location\n/cancel - Cancel the current action\n/help - Show a list of available commands'
+            bot.sendMessage(chat_id, welcome_message)
+            bot.sendMessage(chat_id, help_message)
 
-        # Sample API call syntax
-        elif '/retrieveip' in user_message:
-            bot.sendMessage(chat_id, 'Retrieving IP...')
-            url = 'https://api.ipify.org?format=json'
-            ipAdd = requests.get(url).text
-            print(ipAdd)
-            bot.sendMessage(chat_id, 'Your IP is: ' + ipAdd)
+        elif '/help' in user_message:
+            help_message = 'Here\'s a list of my commands!\n/taxi - Compare prices across taxi companies by inputting your pick up and drop off location\n/cancel - Cancel the current action\n/help - Show a list of available commands'
+            bot.sendMessage(chat_id, help_message)
 
         # Start taxi price check program
         elif '/taxi' in user_message:
@@ -105,11 +62,11 @@ def on_chat_message(msg):
 
         elif chat_context == 'location_pickup' :
             init_loc_data = []
-            chat_context = 'location_dropoff'
-            reply_message = 'Sweet! I found these locations! Which would you like your pick up point to be?'
+            error_message = 'Ah sorry, but I couldn\'t find any search results for your location. Perhaps try a different one?'
+            reply_message = 'Sweet! I found these locations! Which would you like your <b>pick up</b> point to be?'
             global autocomplete_data
             autocomplete_data = gmaps.places_autocomplete(
-                input_text = msg['text'],
+                input_text = user_message,
                 offset = 3,
                 language = 'en',
                 components = { 'country': 'sg' }
@@ -121,13 +78,18 @@ def on_chat_message(msg):
                 init_loc_data.append([InlineKeyboardButton(text=place['description'], callback_data=callback_id)])
 
             loc_keyboard = InlineKeyboardMarkup(inline_keyboard=init_loc_data)
-            bot.sendMessage(chat_id, reply_message, reply_markup=loc_keyboard)
+
+            if len(autocomplete_data) == 0:
+                bot.sendMessage(chat_id, error_message)
+            else:
+                bot.sendMessage(chat_id, reply_message, parse_mode='HTML', reply_markup=loc_keyboard)
 
         elif chat_context == 'location_dropoff':
             init_loc_data = []
-            reply_message = 'Gotcha! I found these locations! Which would you like your drop off point to be?'
+            error_message = 'Ah sorry! I couldn\'t find any results that match with that location! Perhaps try a different one?'
+            reply_message = 'Gotcha! I found these locations! Which would you like your <b>drop off</b> point to be?'
             autocomplete_data = gmaps.places_autocomplete(
-                input_text = msg['text'],
+                input_text = user_message,
                 offset = 3,
                 language = 'en',
                 components = { 'country': 'sg' }
@@ -139,43 +101,15 @@ def on_chat_message(msg):
                 init_loc_data.append([InlineKeyboardButton(text=place['description'], callback_data=callback_id)])
 
             loc_keyboard = InlineKeyboardMarkup(inline_keyboard=init_loc_data)
-            bot.sendMessage(chat_id, reply_message, reply_markup=loc_keyboard)
 
-        # Show Custom Buttons on the phone's keyboard area
-        # Use case, buttons that's always used for the bot, to help UX
-        elif '/inline' in user_message:
-            markup = ReplyKeyboardMarkup(keyboard=[
-                     ['Plain text', KeyboardButton(text='Text only')],
-                     [dict(text='Phone', request_contact=True), KeyboardButton(text='Location', request_location=True)],
-                 ])
-            bot.sendMessage(chat_id, 'Custom keyboard with various buttons', reply_markup=markup)
+            if len(autocomplete_data) == 0:
+                bot.sendMessage(chat_id, error_message)
+            else:
+                bot.sendMessage(chat_id, reply_message, parse_mode='HTML', reply_markup=loc_keyboard)
 
-        # Hide the Custom Buttons on the phone's keyboard area
-        elif '/hide' in user_message:
-            markup = ReplyKeyboardRemove()
-            bot.sendMessage(chat_id, 'Hide custom keyboard', reply_markup=markup)
-
-        # Show Custom Buttons in Chat Area
-        # Give options to user
-        elif '/help' in user_message:
-            bot.sendMessage(chat_id, 'Gimme a second, retrieving prices from the various taxi companies...')
-            markup = InlineKeyboardMarkup(inline_keyboard=[
-                     [dict(text='Uber - $5.80', url='http://www.google.com/')],
-                     [dict(text='Grab - $6.00', url='http://www.google.com/')],
-                     [dict(text='ComfortDelGro - $5.00', url='http://www.google.com/')],
-                    #  [InlineKeyboardButton(text='Callback - show notification', callback_data='notification')],
-                    #  [dict(text='Callback - show alert', callback_data='alert')],
-                    #  [InlineKeyboardButton(text='Callback - edit message', callback_data='edit')],
-                    #  [dict(text='Switch to using bot inline', switch_inline_query='initial query')],
-                 ])
-
-            global message_with_inline_keyboard
-            message_with_inline_keyboard = bot.sendMessage(chat_id, 'These are the prices to travel from Boon Lay MRT to NTU Tanjong Hall of Residence', reply_markup=markup)
-
-        # Return string which user sent, and message sent timestamp
         else :
-            bot.sendMessage(chat_id, 'Hey there ' + msg['from']['username'] + '! You sent me this message: ' + msg['text'])
-            bot.sendMessage(chat_id, 'Sent at: ' + datetime.datetime.fromtimestamp(int(msg['date'])).strftime('%Y-%m-%d %H:%M:%S'))
+            reply_msg = 'I\'m sorry but I don\'t quite understand what you\'re saying. Perhaps try \'/help\' if you\'re looking for commands!'
+            bot.sendMessage(chat_id, reply_msg)
 
 # For Inline Keyboard Markup, respond accordingly for callbacks
 def on_callback_query(msg):
@@ -192,6 +126,7 @@ def on_callback_query(msg):
         global pickup_lng
         global pickup_location
         global pickup_placeid
+        global chat_context
         pickup_lat = place_result['result']['geometry']['location']['lat']
         pickup_lng = place_result['result']['geometry']['location']['lng']
         pickup_location = place_result['result']['name']
@@ -199,6 +134,7 @@ def on_callback_query(msg):
 
         notif_msg = 'Pick up location set at ' + place_result['result']['name']
         bot.answerCallbackQuery(query_id, text=notif_msg)
+        chat_context = 'location_dropoff'
         bot.sendMessage(chat_assigned, 'Now where would you like to be dropped off at?')
 
     elif 'location_dropoff' in query_data:
@@ -207,6 +143,8 @@ def on_callback_query(msg):
         selected_place_id = selected_pickup_location['place_id']
 
         place_result = gmaps.place(selected_place_id, 'en')
+
+        print(place_result)
 
         global dropoff_lat
         global dropoff_lng
@@ -219,30 +157,42 @@ def on_callback_query(msg):
 
         notif_msg = 'Drop off location set at ' + place_result['result']['name']
         bot.answerCallbackQuery(query_id, text=notif_msg)
-        bot.sendMessage(chat_assigned, 'Gotcha! Retrieving prices...')
 
         distance_estimate = distance.estimate(pickup_placeid, dropoff_placeid)
 
-        # Calculate Grab Fare estimate
-        # Calculate CityCab Fare estimate
+        if (distance_estimate != 0):
+            bot.sendMessage(chat_assigned, 'Gotcha! Retrieving prices...')
 
-        comfort_estimate = "Comfort: SGD " + comfort.estimate(distance_estimate)
+            grab_estimate = "Grab: SGD " + grab.estimate(distance_estimate)
 
-        uber_estimate = "Uber: " + uber.get_price_estimate(
-            start_lat=pickup_lat,
-            start_lng=pickup_lng,
-            end_lat=dropoff_lat,
-            end_lng=dropoff_lng
-        )
+            comfort_estimate = "ComfortDelGro: SGD " + comfort.estimate(
+                start_lat=pickup_lat,
+                start_lng=pickup_lng,
+                end_lat=dropoff_lat,
+                end_lng=dropoff_lng
+            )
 
-        price_collation = InlineKeyboardMarkup(inline_keyboard=[
-            [dict(text=uber_estimate, url='http://www.google.com/')],
-            [dict(text=comfort_estimate, url='http://www.google.com/')]
-        ])
+            uber_estimate = "Uber: " + uber.get_price_estimate(
+                start_lat=pickup_lat,
+                start_lng=pickup_lng,
+                end_lat=dropoff_lat,
+                end_lng=dropoff_lng
+            )
 
-        price_estimate_msg = "Here are the estimated prices to travel from " + pickup_location + " to " + dropoff_location + " from the various taxi companies!"
+            price_collation = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text=uber_estimate, callback_data='no')],
+                [InlineKeyboardButton(text=grab_estimate, callback_data='no')],
+                [InlineKeyboardButton(text=comfort_estimate, callback_data='no')],
+            ])
 
-        bot.sendMessage(chat_assigned, price_estimate_msg, reply_markup=price_collation)
+            price_estimate_msg = "Here are the estimated prices to travel from " + pickup_location + " to " + dropoff_location + " from the various taxi companies!"
+            finish_msg = "Feel free to type \'/taxi\' again to retrieve more fare comparisons! :)"
+
+            bot.sendMessage(chat_assigned, price_estimate_msg, reply_markup=price_collation)
+            bot.sendMessage(chat_assigned, finish_msg)
+        else:
+            error_msg = "I'm sorry but you've inserted an invalid pick up and drop off point! Please type '/taxi' to try again with a different set of locations"
+            bot.sendMessage(chat_assigned, error_msg)
 
 
 print('Listening...')
@@ -255,5 +205,4 @@ MessageLoop(bot, {
 
 # Keep the program running
 while 1:
-    schedule.run_pending()
     time.sleep(1)
