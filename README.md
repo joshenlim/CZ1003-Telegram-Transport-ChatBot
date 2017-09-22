@@ -1,20 +1,19 @@
 # Dora - Telegram Bot
-### About
 Dora is a one-stop bot to quickly retrieve taxi fare estimations and make comparisons all on one convenient single platform. You no longer have to open multiple applications on your mobile phone before coming to a decision! Taxi companies currently in the list of comparisons include Uber, Grab and ComfortDelGro.
 
-### APIs Integrated
+## APIs Integrated
   * Google Places Distance Matrix
   * Google Places Autocomplete
   * Google Places
   * TaxiFareFinder Fare Estimate
   * Uber Fare Estimate
 
-### Commands
+## Commands
   * /taxi - Compare prices across taxi companies by inputting your pick up and drop off location
   * /cancel - Cancel the current action
   * /help - Show a list of available commands
 
-### Quick Start (Locally)
+## Quick Start (Locally)
   1. Navigate into the directory via the terminal using <code>cd PATH/TO/FOLDER</code>
   2. Create a <code>config.py</code> using <code>sampleconfig.py</code> as a template. Be sure to have created your own bot via The Botfather and input your own bot API key.
   3. Run <code>python3 telegramBot.py</code> to initiate server
