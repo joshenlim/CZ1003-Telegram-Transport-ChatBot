@@ -113,10 +113,10 @@ def on_chat_message(msg):
 
 # For Inline Keyboard Markup, respond accordingly for callbacks
 def on_callback_query(msg):
-    query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
+    query_id, from_id, callback_data = telepot.glance(msg, flavor='callback_query')
 
-    if 'location_pickup' in query_data:
-        selected_query_id = int(query_data[-1])
+    if 'location_pickup' in callback_data:
+        selected_query_id = int(callback_data[-1])
         selected_pickup_location = autocomplete_data[selected_query_id]
         selected_place_id = selected_pickup_location['place_id']
 
@@ -137,14 +137,12 @@ def on_callback_query(msg):
         chat_context = 'location_dropoff'
         bot.sendMessage(chat_assigned, 'Now where would you like to be dropped off at?')
 
-    elif 'location_dropoff' in query_data:
-        selected_query_id = int(query_data[-1])
+    elif 'location_dropoff' in callback_data:
+        selected_query_id = int(callback_data[-1])
         selected_pickup_location = autocomplete_data[selected_query_id]
         selected_place_id = selected_pickup_location['place_id']
 
         place_result = gmaps.place(selected_place_id, 'en')
-
-        print(place_result)
 
         global dropoff_lat
         global dropoff_lng
@@ -158,12 +156,14 @@ def on_callback_query(msg):
         notif_msg = 'Drop off location set at ' + place_result['result']['name']
         bot.answerCallbackQuery(query_id, text=notif_msg)
 
-        distance_estimate = distance.estimate(pickup_placeid, dropoff_placeid)
+        distance_matrix = distance.estimate(pickup_placeid, dropoff_placeid)
+        distance_estimate = distance_matrix['distance']['value']
+        duration_estimate = distance_matrix['duration']['value']
 
         if (distance_estimate != 0):
             bot.sendMessage(chat_assigned, 'Gotcha! Retrieving prices...')
 
-            grab_estimate = "Grab: SGD " + grab.estimate(distance_estimate)
+            grab_estimate = "Grab: SGD " + grab.estimate(distance_estimate, duration_estimate)
 
             comfort_estimate = "ComfortDelGro: SGD " + comfort.estimate(
                 start_lat=pickup_lat,
@@ -188,10 +188,12 @@ def on_callback_query(msg):
             price_estimate_msg = "Here are the estimated prices to travel from " + pickup_location + " to " + dropoff_location + " from the various taxi companies!"
             finish_msg = "Feel free to type \'/taxi\' again to retrieve more fare comparisons! :)"
 
+            chat_context = 'none'
             bot.sendMessage(chat_assigned, price_estimate_msg, reply_markup=price_collation)
             bot.sendMessage(chat_assigned, finish_msg)
         else:
             error_msg = "I'm sorry but you've inserted an invalid pick up and drop off point! Please type '/taxi' to try again with a different set of locations"
+            chat_context = 'none'
             bot.sendMessage(chat_assigned, error_msg)
 
 
