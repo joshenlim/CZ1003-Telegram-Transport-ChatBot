@@ -52,5 +52,3 @@ Below are example inputs to achieve the corresponding test cases, where you'll s
   * Dora: 'Gotcha! Retrieving prices...'
   * Dora: 'Here are the estimated prices to travel from NTU Tanjong Hall of Residence to Jurong Point from the various taxi companies!'
   * Dora: 'Feel free to type '/taxi' again to retrieve more fare comparisons! :)'
-
-  PLEASE WRITE DOWN FOR FAIL CASES TOO HOrh
