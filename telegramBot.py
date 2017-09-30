@@ -77,6 +77,8 @@ def on_chat_message(msg):
 
             for place in autocomplete_data:
                 id = autocomplete_data.index(place)
+                # Generate unique id for each button to retrieve place data by index
+                # from autocomplete_data list fter user selects a button
                 callback_id = 'location_pickup_' + str(id)
                 init_loc_data.append([InlineKeyboardButton(text=place['description'], callback_data=callback_id)])
 
