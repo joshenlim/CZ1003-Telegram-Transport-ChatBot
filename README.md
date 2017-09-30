@@ -2,7 +2,7 @@
 
 <img src="https://s3-ap-southeast-1.amazonaws.com/common.assets/Dorafinak.png" width=200/>
 
-Dora is a one-stop bot to quickly retrieve taxi fare estimations and make comparisons all on one convenient single platform. You no longer have to open multiple applications on your mobile phone before coming to a decision! Taxi companies currently in the list of comparisons include Uber, Grab and ComfortDelGro.
+Dora is a one-stop bot to quickly retrieve taxi fare estimations and make comparisons all on one convenient single platform. You no longer have to open multiple applications on your mobile phone before coming to a decision! Taxi companies currently in the list of comparisons include Uber, Grab and ComfortDelGro. Chat with Dora now on Telegram @dooorabot!
 
 ## APIs Integrated
   * Google Places Distance Matrix
@@ -18,10 +18,10 @@ Dora is a one-stop bot to quickly retrieve taxi fare estimations and make compar
 
 ## Quick Start (Locally)
   1. Navigate into the directory via the terminal using <code>cd PATH/TO/FOLDER</code>
-  2. Run `pip install -r requirements.txt`
-  3. Create a <code>config.py</code> using <code>sampleconfig.py</code> as a template. Be sure to have created your own bot via The Botfather and input your own bot API key.
-  4. Run <code>python3 telegramBot.py</code> to initiate server
-  5. Start conversing with your own bot
+  2. Install the required modules by running `pip3 install -r requirements.txt` (Note that this bot runs on Python 3)
+  3. Create a `config.py` using `sampleconfig.py` as a template. This will be where all the API keys will be stored and used. Be sure to have created your own bot via The Botfather and input your own bot API key.
+  4. Run `python3 telegramBot.py` on your terminal to start the server
+  5. Start conversing with your own bot on Telegram
 
 ## Test Cases
 Below are example inputs to achieve the corresponding test cases, where you'll see how Dora responds accordingly.

@@ -21,3 +21,5 @@ six==1.10.0
 telepot==12.3
 twitter==1.17.1
 urllib3==1.22
+googlemaps==2.5.1
+uber-rides==0.5.2
