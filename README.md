@@ -1,4 +1,7 @@
 # Dora - Telegram Bot
+
+<img src="https://s3-ap-southeast-1.amazonaws.com/common.assets/Dorafinak.png" width=200/>
+
 Dora is a one-stop bot to quickly retrieve taxi fare estimations and make comparisons all on one convenient single platform. You no longer have to open multiple applications on your mobile phone before coming to a decision! Taxi companies currently in the list of comparisons include Uber, Grab and ComfortDelGro.
 
 ## APIs Integrated
