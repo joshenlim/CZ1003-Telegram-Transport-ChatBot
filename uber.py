@@ -1,3 +1,6 @@
+# Retrieve Uber's fare estimate
+# Using Uber's Fare Estimation API
+
 from uber_rides.session import Session
 from uber_rides.client import UberRidesClient
 import config as cfg

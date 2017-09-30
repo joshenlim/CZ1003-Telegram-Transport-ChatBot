@@ -1,18 +1,20 @@
+# Python Libraries
 import sys
 import time
 import telepot
 import datetime
 import requests
 import googlemaps
+from telepot.loop import MessageLoop
+from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
+from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
+
+# User created files
 import uber
 import grab
 import comfort
 import distance
 import config as cfg
-
-from telepot.loop import MessageLoop
-from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
-from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ForceReply
 
 gmaps_key = cfg.google['places_key']
 gmaps = googlemaps.Client(key=gmaps_key)
@@ -45,6 +47,7 @@ def on_chat_message(msg):
             bot.sendMessage(chat_id, welcome_message)
             bot.sendMessage(chat_id, help_message)
 
+        # Display available commands
         elif '/help' in user_message:
             help_message = 'Here\'s a list of my commands!\n/taxi - Compare prices across taxi companies by inputting your pick up and drop off location\n/cancel - Cancel the current action\n/help - Show a list of available commands'
             bot.sendMessage(chat_id, help_message)
@@ -55,7 +58,7 @@ def on_chat_message(msg):
             global chat_context
             chat_context = 'location_pickup'
 
-        # Cancel taxi price check program
+        # Cancel taxi price check program at any point
         elif '/cancel' in user_message:
             bot.sendMessage(chat_id, 'Gotcha, cancelled the current action')
             chat_context = 'none'
@@ -111,7 +114,7 @@ def on_chat_message(msg):
             reply_msg = 'I\'m sorry but I don\'t quite understand what you\'re saying. Perhaps try \'/help\' if you\'re looking for commands!'
             bot.sendMessage(chat_id, reply_msg)
 
-# For Inline Keyboard Markup, respond accordingly for callbacks
+# Respond accordingly for callbacks for Inline Keyboard Markup
 def on_callback_query(msg):
     query_id, from_id, callback_data = telepot.glance(msg, flavor='callback_query')
 
@@ -132,7 +135,7 @@ def on_callback_query(msg):
         pickup_location = place_result['result']['name']
         pickup_placeid = place_result['result']['place_id']
 
-        notif_msg = 'Pick up location set at ' + place_result['result']['name']
+        notif_msg = 'Pick up location set at {}'.format(place_result['result']['name'])
         bot.answerCallbackQuery(query_id, text=notif_msg)
         chat_context = 'location_dropoff'
         bot.sendMessage(chat_assigned, 'Now where would you like to be dropped off at?')
@@ -153,7 +156,7 @@ def on_callback_query(msg):
         dropoff_location = place_result['result']['name']
         dropoff_placeid = place_result['result']['place_id']
 
-        notif_msg = 'Drop off location set at ' + place_result['result']['name']
+        notif_msg = 'Drop off location set at {}'.format(place_result['result']['name'])
         bot.answerCallbackQuery(query_id, text=notif_msg)
 
         distance_matrix = distance.estimate(pickup_placeid, dropoff_placeid)
@@ -185,7 +188,7 @@ def on_callback_query(msg):
                 [InlineKeyboardButton(text=comfort_estimate, callback_data='no')],
             ])
 
-            price_estimate_msg = "Here are the estimated prices to travel from " + pickup_location + " to " + dropoff_location + " from the various taxi companies!"
+            price_estimate_msg = "Here are the estimated prices to travel from  {} to {} from the various taxi companies!".format(pickup_location, dropoff_location)
             finish_msg = "Feel free to type \'/taxi\' again to retrieve more fare comparisons! :)"
 
             chat_context = 'none'
@@ -199,12 +202,10 @@ def on_callback_query(msg):
 
 print('Listening...')
 
-# Listen to user actions on Telegram
 MessageLoop(bot, {
     'chat': on_chat_message,
     'callback_query': on_callback_query,
 }).run_as_thread()
 
-# Keep the program running
 while 1:
     time.sleep(1)

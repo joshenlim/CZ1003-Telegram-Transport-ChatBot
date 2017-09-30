@@ -1,3 +1,6 @@
+# Retrieve the road distance from a start and end point
+# Using Google's Distance Matrix API
+
 import googlemaps
 import config as cfg
 
