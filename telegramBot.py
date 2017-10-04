@@ -40,6 +40,8 @@ def on_chat_message(msg):
     chat_assigned = chat_id
     user_message = msg['text']
 
+    # print("User message: ", user_message)
+
     if content_type == 'text':
         if '/start' in user_message:
             welcome_message = "Ola! Dora at your service! :) With me around you can easily compare prices across taxi companies - no more spending time opening all those applications before coming to a decision!"
@@ -75,7 +77,10 @@ def on_chat_message(msg):
                 components = { 'country': 'sg' }
             )
 
+            # print(autocomplete_data)
+
             for place in autocomplete_data:
+                # print(place)
                 id = autocomplete_data.index(place)
                 # Generate unique id for each button to retrieve place data by index
                 # from autocomplete_data list fter user selects a button
@@ -100,7 +105,10 @@ def on_chat_message(msg):
                 components = { 'country': 'sg' }
             )
 
+            # print(autocomplete_data)
+
             for place in autocomplete_data:
+                # print(place)
                 id = autocomplete_data.index(place)
                 callback_id = 'location_dropoff_' + str(id)
                 init_loc_data.append([InlineKeyboardButton(text=place['description'], callback_data=callback_id)])
@@ -127,6 +135,8 @@ def on_callback_query(msg):
 
         place_result = gmaps.place(selected_place_id, 'en')
 
+        # print(place_result)
+
         global pickup_lat
         global pickup_lng
         global pickup_location
@@ -136,6 +146,11 @@ def on_callback_query(msg):
         pickup_lng = place_result['result']['geometry']['location']['lng']
         pickup_location = place_result['result']['name']
         pickup_placeid = place_result['result']['place_id']
+
+        # print("Pick up latitude:", pickup_lat)
+        # print("Pick up longitude:", pickup_lng)
+        # print("Pick up location:", pickup_location)
+        # print("Pick up Place ID:", pickup_placeid)
 
         notif_msg = 'Pick up location set at {}'.format(place_result['result']['name'])
         bot.answerCallbackQuery(query_id, text=notif_msg)
@@ -149,6 +164,8 @@ def on_callback_query(msg):
 
         place_result = gmaps.place(selected_place_id, 'en')
 
+        # print(place_result)
+
         global dropoff_lat
         global dropoff_lng
         global dropoff_location
@@ -158,12 +175,19 @@ def on_callback_query(msg):
         dropoff_location = place_result['result']['name']
         dropoff_placeid = place_result['result']['place_id']
 
+        # print("Drop off latitude:", dropoff_lat)
+        # print("Drop off longitude:", dropoff_lng)
+        # print("Drop off location:", dropoff_location)
+        # print("Drop off Place ID:", dropoff_placeid)
+
         notif_msg = 'Drop off location set at {}'.format(place_result['result']['name'])
         bot.answerCallbackQuery(query_id, text=notif_msg)
 
         distance_matrix = distance.estimate(pickup_placeid, dropoff_placeid)
         distance_estimate = distance_matrix['distance']['value']
         duration_estimate = distance_matrix['duration']['value']
+
+        # print("Distance Matrix Estimate:", distance_matrix)
 
         if (distance_estimate != 0):
             bot.sendMessage(chat_assigned, 'Gotcha! Retrieving prices...')
@@ -183,6 +207,10 @@ def on_callback_query(msg):
                 end_lat=dropoff_lat,
                 end_lng=dropoff_lng
             )
+
+            # print("Grab estimate:", grab_estimate)
+            # print("Comfort estimate:", comfort_estimate)
+            # print("Uber estimate:", uber_estimate)
 
             price_collation = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text=uber_estimate, callback_data='no')],

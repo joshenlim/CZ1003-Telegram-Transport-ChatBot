@@ -16,7 +16,11 @@ def estimate(origin, destination):
         mode='driving'
     )
 
+    # print(distance_estimate)
+
     status = distance_estimate['rows'][0]['elements'][0]['status']
+
+    # print(status)
 
     if status == 'ZERO_RESULTS':
         return 0

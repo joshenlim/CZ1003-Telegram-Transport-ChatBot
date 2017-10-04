@@ -21,6 +21,8 @@ def get_price_estimate(start_lat, start_lng, end_lat, end_lng):
 
     estimate = response.json.get('prices')
 
+    # print(estimate)
+
     for price in estimate:
         if price['localized_display_name'] == 'uberX':
             # print(price)

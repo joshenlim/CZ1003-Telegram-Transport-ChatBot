@@ -14,4 +14,7 @@ def estimate(distance, duration):
     estimate_upper_range = str(math.ceil(total_fare * 1.1))
     estimate_lower_range = str(math.ceil(total_fare))
 
+    # print(estimate_lower_range)
+    # print(estimate_upper_range)
+
     return estimate_lower_range + " - " + estimate_upper_range
