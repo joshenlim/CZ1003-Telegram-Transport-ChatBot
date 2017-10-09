@@ -184,8 +184,9 @@ def on_callback_query(msg):
         bot.answerCallbackQuery(query_id, text=notif_msg)
 
         distance_matrix = distance.estimate(pickup_placeid, dropoff_placeid)
-        distance_estimate = distance_matrix['distance']['value']
-        duration_estimate = distance_matrix['duration']['value']
+        # print("Distance Matrix:", distance_matrix)
+        distance_estimate = distance_matrix['distance']['value'] if distance_matrix != 0 else 0
+        duration_estimate = distance_matrix['duration']['value'] if distance_matrix != 0 else 0
 
         # print("Distance Matrix Estimate:", distance_matrix)
 
