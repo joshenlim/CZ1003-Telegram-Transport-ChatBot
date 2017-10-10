@@ -4,6 +4,15 @@
 
 Dora is a one-stop bot to quickly retrieve taxi fare estimations and make comparisons all on one convenient single platform. You no longer have to open multiple applications on your mobile phone before coming to a decision! Taxi companies currently in the list of comparisons include Uber, Grab and ComfortDelGro. Chat with Dora now on Telegram @dooorabot!
 
+## Main files involved
+  * `telegramBot.py` - Main Bot file
+  * `config.py` - Stores the IDs, keys and tokens for APIs
+  * `comfort.py` - Returns the fare estimate of ComfortDelGro via an API
+  * `grab.py` - Returns the fare estimate of Grab via an arithmetic algorithm according to Grab's fare structure
+  * `uber.py` - Returns the fare estimate of Uber via an API
+  * `distance.py` - Returns the road distance estimate between two selected locations via Google's Distance Matrix API
+  * `requirements.txt` - Lists the required python libraries for this project
+
 ## APIs Integrated
   * Google Places Distance Matrix
   * Google Places Autocomplete
