@@ -18,3 +18,7 @@ google = {
 tff = {
     'api_key': 'yesTusw7fr6d'
 }
+
+airtable = {
+    'api_key': 'keyskOR4UpdNHS8Iw'
+}
