@@ -182,8 +182,8 @@ def on_callback_query(msg):
     user_id =  user_data['id']
     user_saved_information =  user_data['fields']
 
-    print(user_id)
-    print(user_saved_information)
+    # print(user_id)
+    # print(user_saved_information)
 
     if 'location_pickup' in callback_data:
         selected_query_id = int(callback_data[-1])
