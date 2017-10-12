@@ -21,3 +21,9 @@ Other files within the folder:
 1. .gitignore - Dictates what files to ignore when pushing up to the Git Repository (config.py, for security purposes)
 2. sampleconfig.py - A sample config file for anyone to fill their own credentials, to be renamed as config.py
 3. README.md - README file for the Git Repository
+
+Commands available:
+------------------------------------------
+1. /taxi - Compare prices across taxi companies by inputting your pick up and drop off location
+2. /cancel - Cancel the current action
+3. /help - Show a list of available commands
