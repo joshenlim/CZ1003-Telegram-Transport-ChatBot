@@ -58,8 +58,8 @@ def on_chat_message(msg):
     user_id =  user_data['id']
     user_saved_information =  user_data['fields']
 
-    print(user_id)
-    print(user_saved_information)
+    # print(user_id)
+    # print(user_saved_information)
     # print("User message: ", user_message)
 
     if content_type == 'text':
@@ -114,7 +114,7 @@ def on_chat_message(msg):
             update_user = requests.patch(database_url + '/' + user_id, json=payload, params=database_params)
             user_saved_information = update_user.json()['fields']
 
-            # print(autocomplete_data)
+            print(autocomplete_data)
 
             for place in eval(user_saved_information['autocomplete_data']):
                 # print(place)
