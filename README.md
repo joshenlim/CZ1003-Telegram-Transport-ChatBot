@@ -36,7 +36,7 @@ Dora is a one-stop bot to quickly retrieve taxi fare estimations and make compar
 Below are example inputs to achieve the corresponding test cases, where you'll see how Dora responds accordingly.
 ### 1. Successful Flow
   * Pick Up location: 'ntu tanjong hall'
-  * Drop Off location: 'jurong point'
+  * Drop Off location: 'causeway point'
   * Result: Fare estimates retrieved and comparisons displayed
 
 ### 2. Location not found
